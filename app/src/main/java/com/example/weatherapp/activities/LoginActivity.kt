@@ -48,7 +48,7 @@ public class LoginActivity : ComponentActivity() {
         setContent {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(
+                    LoginComposable(
                         modifier = Modifier.padding(innerPadding),
                         onLoginClicked = { email, password ->
                             // Here you would implement your login logic
@@ -61,7 +61,7 @@ public class LoginActivity : ComponentActivity() {
     }
 
     @Composable
-    fun LoginScreen(
+    fun LoginComposable(
         modifier: Modifier = Modifier,
         onLoginClicked: (String, String) -> Unit
     ) {
