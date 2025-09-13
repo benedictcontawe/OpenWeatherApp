@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.activities.MainActivity
 import com.example.weatherapp.models.ForecastResponseModel
+import com.example.weatherapp.models.WeatherModel
 import com.example.weatherapp.models.WeatherRequestModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -19,6 +20,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class WeatherViewModel : AndroidViewModel {
 
@@ -29,7 +34,7 @@ class WeatherViewModel : AndroidViewModel {
     private val repository : Repository
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val fusedLocationClient : FusedLocationProviderClient
-    private val liveWeatherResponse : MutableLiveData<WeatherResponseModel?>
+    private val liveWeather : MutableLiveData<WeatherModel?>
     private val liveForcastResponse : MutableLiveData<ForecastResponseModel?>
     private val isRefreshing : MutableStateFlow<Boolean>
 
@@ -38,7 +43,7 @@ class WeatherViewModel : AndroidViewModel {
         repository = Repository()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(application ?: getApplication<Application>())
         isRefreshing = MutableStateFlow<Boolean>(false)
-        liveWeatherResponse = MutableLiveData<WeatherResponseModel?>(null)
+        liveWeather = MutableLiveData<WeatherModel?>(null)
         liveForcastResponse = MutableLiveData<ForecastResponseModel?>(null)
     }
 
@@ -73,9 +78,18 @@ class WeatherViewModel : AndroidViewModel {
                                 location?.getLatitude()!!,
                                 location?.getLongitude()!!
                             )
+                            Log.d(TAG, "requestWeather() ${request.toString()}")
                             response = repository.getWeather(request)
+                            val model : WeatherModel = WeatherModel(
+                                response!!.id.toString(),
+                                response!!.sys.country,
+                                response!!.weather.first().main,
+                                response!!.main.temp.toString(),
+                                unixToTime(response!!.sys.sunrise),
+                                unixToTime(response!!.sys.sunset),
+                            )
                             Log.d(TAG, "requestWeather() ${response.toString()}")
-                            liveWeatherResponse.postValue(response)//TODO: Handle response
+                            liveWeather.postValue(model)
                             isRefreshing.emit(false)
                     }
                 }
@@ -83,8 +97,16 @@ class WeatherViewModel : AndroidViewModel {
                 viewModelScope.launch(Dispatchers.IO) {
                     request = WeatherRequestModel(Constants.API_KEY, 44.34, 10.99)
                     response = repository.getWeather(request)
+                    val model : WeatherModel = WeatherModel(
+                        response!!.id.toString(),
+                        response!!.sys.country,
+                        response!!.weather.first().main,
+                        response!!.main.temp.toString(),
+                        unixToTime(response!!.sys.sunrise),
+                        unixToTime(response!!.sys.sunset),
+                    )
                     Log.d(TAG, "requestWeather() ${response.toString()}")
-                    liveWeatherResponse.postValue(response)//TODO: Handle response
+                    liveWeather.postValue(model)
                     isRefreshing.emit(false)
                 }
             }
@@ -123,11 +145,17 @@ class WeatherViewModel : AndroidViewModel {
         )
     }
 
+    private fun unixToTime(unix: Long): String {
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        sdf.timeZone = TimeZone.getDefault()
+        return sdf.format(Date(unix * 1000))
+    }
+
     public fun observeRefreshing() : StateFlow<Boolean> {
         return isRefreshing.asStateFlow<Boolean>()
     }
 
-    public fun observeWeather() : LiveData<WeatherResponseModel?> = liveWeatherResponse
+    public fun observeWeather() : LiveData<WeatherModel?> = liveWeather
 
     public fun observeForcast() : LiveData<ForecastResponseModel?> = liveForcastResponse
 
