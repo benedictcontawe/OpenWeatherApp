@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "114119225553",
+    "firebase_url": "https://flutterapp-419b8-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "flutterapp-419b8",
+    "storage_bucket": "flutterapp-419b8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114119225553:android:b54942cdbb39c53b8fd5f0",
+        "android_client_info": {
+          "package_name": "com.example.weatherapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpSHgMvKw6-wGVx_zd1zx_9mVkxAiG2K8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114119225553:android:f4f330675218ef668fd5f0",
+        "android_client_info": {
+          "package_name": "com.sample.getx_storage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpSHgMvKw6-wGVx_zd1zx_9mVkxAiG2K8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

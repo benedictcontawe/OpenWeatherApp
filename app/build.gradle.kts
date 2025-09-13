@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -76,6 +77,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
     implementation(libs.androidx.runtime.livedata)
+    implementation("com.google.firebase:firebase-auth:22.3.1")
     //endregion
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -29,7 +29,7 @@ public class Repository {
         )
         weatherAPI = createService(WeatherAPI::class.java)
     }
-
+    //region Retrofit
     private fun provideRetrofit(url : String, gson : Gson, okHttpClient : OkHttpClient) : Retrofit {
         return Retrofit.Builder()
             .baseUrl(url)
@@ -85,4 +85,5 @@ public class Repository {
     private fun <S> createService(serviceClass : Class<S>?) : S {
         return retrofit!!.create(serviceClass)
     }
+    //endregion
 }

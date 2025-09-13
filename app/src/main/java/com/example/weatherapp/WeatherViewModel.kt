@@ -12,6 +12,8 @@ import com.example.weatherapp.models.WeatherRequestModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,7 @@ class WeatherViewModel : AndroidViewModel {
     }
 
     private val repository : Repository
+    private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val fusedLocationClient : FusedLocationProviderClient
     private val liveWeatherResponse : MutableLiveData<WeatherResponseModel?>
     private val liveForcastResponse : MutableLiveData<ForecastResponseModel?>
@@ -127,4 +130,16 @@ class WeatherViewModel : AndroidViewModel {
     public fun observeWeather() : LiveData<WeatherResponseModel?> = liveWeatherResponse
 
     public fun observeForcast() : LiveData<ForecastResponseModel?> = liveForcastResponse
+
+    fun getUser() : FirebaseUser? {
+        return firebaseAuth.getCurrentUser()
+    }
+
+    fun isUserSignedIn() : Boolean {
+        return if (getUser() != null) true else false
+    }
+
+    fun signOut() {
+        firebaseAuth.signOut()
+    }
 }

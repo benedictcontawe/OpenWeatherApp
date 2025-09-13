@@ -1,10 +1,12 @@
 package com.example.weatherapp.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,9 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weatherapp.AuthenticationViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 
 public class LoginActivity : ComponentActivity() {
@@ -43,17 +44,32 @@ public class LoginActivity : ComponentActivity() {
         private val TAG = LoginActivity::class.java.simpleName
     }
 
+    private val viewModel : AuthenticationViewModel by viewModels<AuthenticationViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     LoginComposable(
                         modifier = Modifier.padding(innerPadding),
-                        onLoginClicked = { email, password ->
-                            // Here you would implement your login logic
-                            Log.d(TAG, "Login attempt with email: $email and password: $password")
+                        onLoginClicked = {
+                            viewModel.checkCredential(
+                                activity = this@LoginActivity,
+                                onSuccess = { user ->
+                                    Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                                    startActivity(Intent(this, MainActivity::class.java))
+                                },
+                                onFailure = { exception ->
+                                    Toast.makeText(this, "Login failed: ${exception?.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        },
+                        onSignUpClicked = {
+                            startActivity(Intent(this, RegisterActivity::class.java))
                         }
+
                     )
                 }
             }
@@ -63,10 +79,11 @@ public class LoginActivity : ComponentActivity() {
     @Composable
     fun LoginComposable(
         modifier: Modifier = Modifier,
-        onLoginClicked: (String, String) -> Unit
+        onLoginClicked: () -> Unit,
+        onSignUpClicked: () -> Unit
     ) {
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        val email : String by viewModel.observeEmail().observeAsState("")
+        val password : String by viewModel.observePassword().observeAsState("")
         val context = LocalContext.current
         Column(
             modifier = modifier
@@ -90,7 +107,7 @@ public class LoginActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(48.dp))
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { newEmail -> viewModel.setEmail(newEmail) },
                 label = { Text("Email") },
                 leadingIcon = {
                     Icon(Icons.Default.Email, contentDescription = "Email Icon")
@@ -101,7 +118,7 @@ public class LoginActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { newPassword -> viewModel.setPassword(newPassword) },
                 label = { Text("Password") },
                 leadingIcon = {
                     Icon(Icons.Default.Lock, contentDescription = "Password Icon")
@@ -121,7 +138,7 @@ public class LoginActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { onLoginClicked(email, password) },
+                onClick = { onLoginClicked() },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = email.isNotBlank() && password.isNotBlank()
             ) {
@@ -129,9 +146,7 @@ public class LoginActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(24.dp))
             TextButton(
-                onClick = {
-                    Toast.makeText(context, "Sign Up functionality will go here.", Toast.LENGTH_SHORT).show()
-                }
+                onClick = onSignUpClicked
             ) {
                 Text("Don't have an account? Sign up")
             }
