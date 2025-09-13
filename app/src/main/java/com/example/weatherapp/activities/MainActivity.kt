@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.R
 import com.example.weatherapp.WeatherViewModel
-import com.example.weatherapp.models.ForecastResponseModel
+import com.example.weatherapp.models.ForecastModel
 import com.example.weatherapp.models.WeatherModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import java.util.Calendar
@@ -66,7 +66,7 @@ public class MainActivity : ComponentActivity() {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val weatherModel : WeatherModel? by viewModel.observeWeather().observeAsState(null)
-                    val forecastResponseModel : ForecastResponseModel? by viewModel.observeForcast().observeAsState(null)
+                    val forecastList : List<ForecastModel>? by viewModel.observeForecast().observeAsState(null)
                     Box(
                         modifier = Modifier
                             .fillMaxSize().padding(innerPadding)
@@ -128,7 +128,7 @@ public class MainActivity : ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = "${weather.temperature}°F",
+                                        text = "${weather.temperature}°C",
                                         color = Color.White,
                                         fontSize = 64.sp,
                                         fontWeight = FontWeight.ExtraBold
