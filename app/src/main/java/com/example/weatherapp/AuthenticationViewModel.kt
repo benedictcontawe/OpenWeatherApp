@@ -2,6 +2,9 @@ package com.example.weatherapp
 
 import android.app.Activity
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -33,6 +36,10 @@ public class AuthenticationViewModel : ViewModel {
         password.setValue(updatedValue)
     }
 
+    public fun setConfirmPassword(updatedValue : String) {
+        _confirmPassword.setValue(updatedValue)
+    }
+
     public fun observeEmail() : MutableLiveData<String> = email
     public fun observePassword() : MutableLiveData<String> = password
 
@@ -45,9 +52,11 @@ public class AuthenticationViewModel : ViewModel {
                 Log.d(TAG, "checkCredential 2")
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success. User: ${task.result.user?.email}")
+                    _message.value = "Login Successful 🎉"
                     onSuccess(task.result.user)
                 } else if (task.isSuccessful.not()) {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    _message.value = "Invalid credentials ❌"
                     onFailure(task.exception)
                 }
             }
@@ -58,13 +67,22 @@ public class AuthenticationViewModel : ViewModel {
 
     public fun registerCredential(activity : Activity, onSuccess : (FirebaseUser?) -> Unit, onFailure : (Throwable?) -> Unit) {
         try {
-            if (email.getValue()?.isBlank() == true || password.getValue()?.isBlank() == true) onFailure(throw Exception("Email or Password is Blank"))
+            if (email.getValue()?.isBlank() == true || password.getValue()?.isBlank() == true) {
+                _message.value = "All fields are required ❌"
+                onFailure(throw Exception("Email or Password is Blank"))
+            }
+            if (password.getValue() != confirmPassword.getValue()) {
+                _message.value = "Passwords do not match ❌"
+                onFailure(throw Exception("Passwords do not match"))
+            }
             firebaseAuth.createUserWithEmailAndPassword (email.getValue() ?: "", password.getValue() ?: "").addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success. User: ${task.result.user?.email}")
+                    _message.value = "Registration Successful 🎉"
                     onSuccess(task.result.user)
                 } else if (task.isSuccessful.not()) {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    _message.value = "Invalid credentials ❌"
                     onFailure(task.exception)
                 }
             }

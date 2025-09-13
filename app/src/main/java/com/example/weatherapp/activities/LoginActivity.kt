@@ -7,19 +7,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -30,13 +29,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.weatherapp.AuthenticationViewModel
+import com.example.weatherapp.R
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 
 public class LoginActivity : ComponentActivity() {
@@ -84,7 +81,7 @@ public class LoginActivity : ComponentActivity() {
     ) {
         val email : String by viewModel.observeEmail().observeAsState("")
         val password : String by viewModel.observePassword().observeAsState("")
-        val context = LocalContext.current
+        val message by viewModel.message
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -92,27 +89,18 @@ public class LoginActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Welcome Back",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+            Image(
+                painter = painterResource(id = R.drawable.aether),
+                contentDescription = "Aether Logo",
+                modifier = Modifier
+                    .size(300.dp)
+                    .padding(bottom = 32.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Log in to your account",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(48.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { newEmail -> viewModel.setEmail(newEmail) },
                 label = { Text("Email") },
-                leadingIcon = {
-                    Icon(Icons.Default.Email, contentDescription = "Email Icon")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -120,35 +108,34 @@ public class LoginActivity : ComponentActivity() {
                 value = password,
                 onValueChange = { newPassword -> viewModel.setPassword(newPassword) },
                 label = { Text("Password") },
-                leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = "Password Icon")
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation()
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextButton(
-                onClick = {
-                    Toast.makeText(context, "Forgot Password functionality will go here.", Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text("Forgot Password?")
-            }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = { onLoginClicked() },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 enabled = email.isNotBlank() && password.isNotBlank()
             ) {
-                Text("Login", fontSize = 18.sp, modifier = Modifier.padding(vertical = 4.dp))
+                Text("Login")
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            TextButton(
-                onClick = onSignUpClicked
-            ) {
-                Text("Don't have an account? Sign up")
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Don't have an account?")
+                Spacer(modifier = Modifier.width(5.dp))
+                TextButton(onClick = onSignUpClicked) {
+                    Text(text = "Register")
+                }
+            }
+            if (message.isNotEmpty()) {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
         }
     }
