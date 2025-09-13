@@ -1,6 +1,5 @@
-package com.example.weatherapp
+package com.example.weatherapp.activities
 
-import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,10 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import com.example.weatherapp.WeatherViewModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 
-class MainActivity : ComponentActivity() {
+public class MainActivity : ComponentActivity() {
 
     companion object {
         private val TAG = MainActivity::class.java.getSimpleName()

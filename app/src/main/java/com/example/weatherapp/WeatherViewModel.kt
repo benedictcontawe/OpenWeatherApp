@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.weatherapp.activities.MainActivity
 import com.example.weatherapp.models.WeatherRequestModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.google.android.gms.location.FusedLocationProviderClient
