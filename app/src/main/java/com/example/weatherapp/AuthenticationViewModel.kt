@@ -22,6 +22,10 @@ public class AuthenticationViewModel : ViewModel {
     private val firebaseAuth : FirebaseAuth by lazy { Firebase.auth }
     private val email : MutableLiveData<String> = MutableLiveData<String>("")
     private val password : MutableLiveData<String> = MutableLiveData<String>("")
+    private val _confirmPassword : MutableLiveData<String> = MutableLiveData<String>("Admin123")
+    val confirmPassword: LiveData<String> = _confirmPassword
+    private val _message = mutableStateOf("")
+    val message: State<String> = _message
 
     constructor() : super() {
         Log.d(TAG, "constructor")
