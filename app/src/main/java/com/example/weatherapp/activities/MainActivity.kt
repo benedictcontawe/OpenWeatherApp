@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -32,8 +31,9 @@ public class MainActivity : ComponentActivity() {
         setContent {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    val response : WeatherResponseModel? by viewModel.observeWeather().observeAsState(null)
+                    Text(
+                        text = "Android ${response.toString()}",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -44,14 +44,5 @@ public class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.requestWeather()
-    }
-
-    @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        val response : WeatherResponseModel? by viewModel.observeWeather().observeAsState(null)
-        Text(
-            text = "Hello ${response.toString()}",
-            modifier = modifier
-        )
     }
 }

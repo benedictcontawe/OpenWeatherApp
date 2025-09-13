@@ -7,7 +7,7 @@ import retrofit2.http.QueryMap
 
 //https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
 public interface WeatherAPI {
-    @GET(Constants.API_GET)
+    @GET(Constants.API_GET_WEATHER)
     public fun getWeather(
         @QueryMap parameters: Map<String, String>
     ) : Call<WeatherResponseModel>
