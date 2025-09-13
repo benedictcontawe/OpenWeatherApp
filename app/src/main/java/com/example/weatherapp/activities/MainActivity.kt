@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import com.example.weatherapp.WeatherViewModel
+import com.example.weatherapp.models.ForecastResponseModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 
@@ -31,7 +32,8 @@ public class MainActivity : ComponentActivity() {
         setContent {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val response : WeatherResponseModel? by viewModel.observeWeather().observeAsState(null)
+                    //val response : WeatherResponseModel? by viewModel.observeWeather().observeAsState(null)
+                    val response : ForecastResponseModel? by viewModel.observeForcast().observeAsState(null)
                     Text(
                         text = "Android ${response.toString()}",
                         modifier = Modifier.padding(innerPadding)
@@ -44,5 +46,6 @@ public class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.requestWeather()
+        viewModel.requestForecast()
     }
 }

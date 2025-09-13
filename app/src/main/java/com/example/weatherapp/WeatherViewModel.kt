@@ -1,13 +1,13 @@
 package com.example.weatherapp
 
 import android.app.Application
-import android.location.Location
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.activities.MainActivity
+import com.example.weatherapp.models.ForecastResponseModel
 import com.example.weatherapp.models.WeatherRequestModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -26,7 +26,8 @@ class WeatherViewModel : AndroidViewModel {
 
     private val repository : Repository
     private val fusedLocationClient : FusedLocationProviderClient
-    private val liveResponse : MutableLiveData<WeatherResponseModel?>
+    private val liveWeatherResponse : MutableLiveData<WeatherResponseModel?>
+    private val liveForcastResponse : MutableLiveData<ForecastResponseModel?>
     private val isRefreshing : MutableStateFlow<Boolean>
 
     constructor(application : Application) : super(application) {
@@ -34,7 +35,8 @@ class WeatherViewModel : AndroidViewModel {
         repository = Repository()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(application ?: getApplication<Application>())
         isRefreshing = MutableStateFlow<Boolean>(false)
-        liveResponse = MutableLiveData<WeatherResponseModel?>(null)
+        liveWeatherResponse = MutableLiveData<WeatherResponseModel?>(null)
+        liveForcastResponse = MutableLiveData<ForecastResponseModel?>(null)
     }
 
     public fun onCheckLocationPermission(activity : MainActivity) {
@@ -55,7 +57,6 @@ class WeatherViewModel : AndroidViewModel {
     public fun requestWeather() {
         //isRefreshing.emit(true)
         //isRefreshing.value = true
-        var location : Location?
         var request : WeatherRequestModel
         var response : WeatherResponseModel?
         ManifestPermission.checkSelfPermission (
@@ -71,7 +72,7 @@ class WeatherViewModel : AndroidViewModel {
                             )
                             response = repository.getWeather(request)
                             Log.d(TAG, "requestWeather() ${response.toString()}")
-                            liveResponse.postValue(response)//TODO: Handle response
+                            liveWeatherResponse.postValue(response)//TODO: Handle response
                             isRefreshing.emit(false)
                     }
                 }
@@ -80,7 +81,39 @@ class WeatherViewModel : AndroidViewModel {
                     request = WeatherRequestModel(Constants.API_KEY, 44.34, 10.99)
                     response = repository.getWeather(request)
                     Log.d(TAG, "requestWeather() ${response.toString()}")
-                    liveResponse.postValue(response)//TODO: Handle response
+                    liveWeatherResponse.postValue(response)//TODO: Handle response
+                    isRefreshing.emit(false)
+                }
+            }
+        )
+    }
+
+    public fun requestForecast() {
+        var request : WeatherRequestModel
+        var response : ForecastResponseModel?
+        ManifestPermission.checkSelfPermission (
+            getApplication<Application>(),
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            isGranted = {
+                fusedLocationClient.getLastLocation().addOnSuccessListener { location ->
+                    viewModelScope.launch(Dispatchers.IO) {
+                        request = WeatherRequestModel(
+                            Constants.API_KEY,
+                            location?.getLatitude()!!,
+                            location?.getLongitude()!!
+                        )
+                        response = repository.getForecast(request)
+                        Log.d(TAG, "requestWeather() ${response.toString()}")
+                        liveForcastResponse.postValue(response)//TODO: Handle response
+                        isRefreshing.emit(false)
+                    }
+                }
+            }, isDenied = {
+                viewModelScope.launch(Dispatchers.IO) {
+                    request = WeatherRequestModel(Constants.API_KEY, 44.34, 10.99)
+                    response = repository.getForecast(request)
+                    Log.d(TAG, "requestWeather() ${response.toString()}")
+                    liveForcastResponse.postValue(response)//TODO: Handle response
                     isRefreshing.emit(false)
                 }
             }
@@ -91,5 +124,7 @@ class WeatherViewModel : AndroidViewModel {
         return isRefreshing.asStateFlow<Boolean>()
     }
 
-    public fun observeWeather() : LiveData<WeatherResponseModel?> = liveResponse
+    public fun observeWeather() : LiveData<WeatherResponseModel?> = liveWeatherResponse
+
+    public fun observeForcast() : LiveData<ForecastResponseModel?> = liveForcastResponse
 }

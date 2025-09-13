@@ -1,6 +1,7 @@
 package com.example.weatherapp
 
 import android.util.Log
+import com.example.weatherapp.models.ForecastResponseModel
 import com.example.weatherapp.models.WeatherRequestModel
 import com.example.weatherapp.models.WeatherResponseModel
 import com.google.gson.Gson
@@ -54,6 +55,21 @@ public class Repository {
     public suspend fun getWeather(request : WeatherRequestModel) : WeatherResponseModel? {
         Log.d(TAG,"getWeather() ${request.toString()}")
         val response : Response<WeatherResponseModel> = weatherAPI.getWeather(request.toMap()).execute()
+        Log.d(TAG,"isSuccessful() ${response.isSuccessful()}")
+        Log.d(TAG,"errorBody() ${response.errorBody()}")
+        Log.d(TAG,"body() ${response.body()}")
+        Log.d(TAG,"code() ${response.code()}")
+        Log.d(TAG,"headers() ${response.headers()}")
+        Log.d(TAG,"message() ${response.message()}")
+        Log.d(TAG,"raw() ${response.raw()}")
+        return if (response.isSuccessful() && response.body() != null) response.body()!!
+        else if (response.isSuccessful().not()) null
+        else null
+    }
+
+    public suspend fun getForecast(request : WeatherRequestModel) : ForecastResponseModel? {
+        Log.d(TAG,"getWeather() ${request.toString()}")
+        val response : Response<ForecastResponseModel> = weatherAPI.getForecast(request.toMap()).execute()
         Log.d(TAG,"isSuccessful() ${response.isSuccessful()}")
         Log.d(TAG,"errorBody() ${response.errorBody()}")
         Log.d(TAG,"body() ${response.body()}")
